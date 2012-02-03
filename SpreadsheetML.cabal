@@ -1,0 +1,31 @@
+Name:                SpreadsheetML
+Version:             0.1
+Synopsis:            Read and write support for Excel's SpreadsheetML format
+-- Description:         
+License:             BSD3
+License-file:        LICENSE
+Author:              Jason Dagit
+Maintainer:          dagitj@gmail.com
+Copyright:           Galois, Inc.
+
+Category:            Text
+
+Build-type:          Simple
+
+Cabal-version:       >=1.8
+
+
+Library
+  -- Modules exported by the library.
+  hs-source-dirs:         src
+  Exposed-modules:     Text.XML.SpreadsheetML.Types
+  
+  -- Packages needed in order to build this package.
+  Build-depends:       base > 3 && < 5
+  
+  -- Modules not exported by this package.
+  -- Other-modules:       
+  
+  -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
+  -- Build-tools:         
+  
