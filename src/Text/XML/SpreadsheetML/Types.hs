@@ -4,6 +4,142 @@ module Text.XML.SpreadsheetML.Types where
 
 import Data.Word ( Word64 )
 
+-- | Only implement what we need
+
+-- TODO: do we need this type?
+{-
+data ExcelWorkbook = ExcelWorkbook
+  { excelWorkbookWindowHeight :: Maybe Word64
+  , excelWorkbookWindowWidth  :: Maybe Word64
+  , excelWorkbookWindowTopX   :: Maybe Word64
+  , excelWorkbookWindowTopY   :: Maybe Word64
+  }
+-}
+
+data Workbook = Workbook
+  { workbookDocumentProperties :: Maybe DocumentProperties
+--  , workbookExcelWorkbook      :: Maybe ExcelWorkbook
+  , workbookWorksheets         :: [Worksheet]
+--  , workbookStyles             :: [Style]
+  }
+  deriving (Read, Show)
+
+data DocumentProperties = DocumentProperties
+  { documentPropertiesTitle       :: Maybe String
+  , documentPropertiesSubject     :: Maybe String
+  , documentPropertiesKeywords    :: Maybe String
+  , documentPropertiesDescription :: Maybe String
+  , documentPropertiesRevision    :: Maybe Word64
+  , documentPropertiesAppName     :: Maybe String
+  , documentPropertiesCreated     :: Maybe String -- ^ Actually, this should be a date time
+  }
+  deriving (Read, Show)
+
+data Worksheet = Worksheet
+  { worksheetTable       :: Maybe Table
+  , worksheetName        :: Name
+  }
+  deriving (Read, Show)
+
+data Table = Table
+  { tableColumns             :: [Column]
+  , tableRows                :: [Row]
+  , tableDefaultColumnWidth  :: Maybe Double -- ^ Default is 48
+  , tableDefaultRowHeight    :: Maybe Double -- ^ Default is 12.75
+  , tableExpandedColumnCount :: Maybe Word64
+  , tableExpandedRowCount    :: Maybe Word64
+  , tableLeftCell            :: Maybe Word64 -- ^ Default is 1
+--  , tableStyleID             :: Maybe StyleID
+  , tableTopCell             :: Maybe Word64 -- ^ Default is 1
+  , tableFullColumns         :: Maybe Bool
+  , tableFullRows            :: Maybe Bool
+  }
+  deriving (Read, Show)
+
+data Column = Column
+  { columnCaption      :: Maybe Caption
+  , columnAutoFitWidth :: Maybe AutoFitWidth
+  , columnHidden       :: Maybe Hidden
+  , columnIndex        :: Maybe Word64
+  , columnSpan         :: Maybe Word64
+--  , columnStyleId      :: Maybe StyleID
+  , columnWidth        :: Maybe Double
+  }
+  deriving (Read, Show)
+
+data Row = Row
+  { rowCells         :: [Cell]
+  , rowCaption       :: Maybe Caption
+  , rowAutoFitHeight :: Maybe AutoFitHeight
+  , rowHeight        :: Maybe Double
+  , rowHidden        :: Maybe Hidden
+  , rowIndex         :: Maybe Word64
+  , rowSpan          :: Maybe Word64
+--  , rowStyleID       :: Maybe StyleID
+  }
+  deriving (Read, Show)
+
+data Cell = Cell
+  -- elements
+  { cellData          :: Maybe ExcelValue
+  -- Attributes
+  , cellFormula       :: Maybe Formula
+  , cellIndex         :: Maybe Word64
+  , cellMergeAcross   :: Maybe Word64
+  , cellMergeDown     :: Maybe Word64
+--  , cellStyleID       :: Maybe StyleID
+  }
+  deriving (Read, Show)
+
+data ExcelValue = Number Double | Boolean Bool | StringType String
+  deriving (Read, Show)
+
+-- | TODO: Currently just a string, but we could model excel formulas and
+-- use that type here instead.
+newtype Formula = Formula String
+  deriving (Read, Show)
+
+data AutoFitWidth = AutoFitWidth | DoNotAutoFitWidth
+  deriving (Read, Show)
+
+data AutoFitHeight = AutoFitHeight | DoNotAutoFitHeight
+  deriving (Read, Show)
+
+-- | Attribute for hidden things
+data Hidden = Shown | Hidden
+  deriving (Read, Show)
+
+-- | For now this is just a string, but we could model excel's names
+newtype Name = Name String
+  deriving (Read, Show)
+
+-- | For now, the value is the name of the style to use
+{-
+newtype StyleID = StyleID String
+  deriving (Read, Show)
+-}
+newtype Caption = Caption String
+  deriving (Read, Show)
+
+{-
+data Style = Style
+  { styleAlignment    :: Maybe Alignment
+  , styleBorders      :: Maybe Borders
+  , styleFont         :: Maybe Font
+  , styleInterior     :: Maybe Interior
+  , styleNumberFormat :: Maybe NumberFormat
+  , styleProtection   :: Maybe Protection
+  , styleID           :: StyleID
+  , styleName         :: Maybe Name
+  , styleParent       :: Maybe StyleID
+  }
+  deriving (Read, Show)
+-}
+
+
+-----------------------------------
+-- Hopefully all this down here is uncessary
+{-
 -- | Bold tag
 data Bold = Bold
   deriving (Read, Show)
@@ -28,10 +164,6 @@ data Toolbar = Toolbar
   { toolbarHideOfficeLogo :: (Maybe HideOfficeLogo)
   , toolbarHidden         :: (Maybe Hidden)
   }
-  deriving (Read, Show)
-
--- | Attribute for hidden things
-data Hidden = Shown | Hidden
   deriving (Read, Show)
 
 -- | Options specific to the spreadsheet
@@ -142,55 +274,9 @@ data Weight = Hairline | Thin | Medium | Thick
 newtype Borders = Borders [Border]
   deriving (Read, Show)
 
-data Cell = Cell
-  -- elements
-  { cellSmartTags     :: Maybe SmartTags
-  , cellComment       :: Maybe Comment
-  , cellData          :: Maybe Data
-  , cellNamedCell     :: Maybe NamedCell
---  , cellPhoneticText  :: Maybe PhoneticText
-  -- Attributes
-  , cellPasteFormula  :: Maybe String
-  , cellArrayRange    :: Maybe ArrayRange
-  , cellFormula       :: Maybe Formula
-  , cellHRef          :: Maybe String
-  , cellIndex         :: Maybe Word64
-  , cellMergeAcross   :: Maybe Word64
-  , cellMergeDown     :: Maybe Word64
-  , cellStyleID       :: Maybe StyleID
---  , cellHRefScreenTip :: Maybe HRefScreenTip
-  }
-  deriving (Read, Show)
-
 -- | TODO: Currently just a String but we could model excel references and
 -- use that type instead.
 newtype ArrayRange = ArrayRange String
-  deriving (Read, Show)
-
--- | TODO: Currently just a string, but we could model excel formulas and
--- use that type here instead.
-newtype Formula = Formula String
-  deriving (Read, Show)
-
--- | For now, the value is the name of the style to use
-newtype StyleID = StyleID String
-  deriving (Read, Show)
-
-data Column = Column
-  { columnCaption      :: Maybe Caption
-  , columnAutoFitWidth :: Maybe AutoFitWidth
-  , columnHidden       :: Maybe Hidden
-  , columnIndex        :: Maybe Word64
-  , columnSpan         :: Maybe Word64
-  , columnStyleId      :: Maybe StyleID
-  , columnWidth        :: Maybe Double
-  }
-  deriving (Read, Show)
-
-newtype Caption = Caption String
-  deriving (Read, Show)
-
-data AutoFitWidth = AutoFitWidth | DoNotAutoFitWidth
   deriving (Read, Show)
 
 data Comment = Comment
@@ -200,26 +286,6 @@ data Comment = Comment
   deriving (Read, Show)
 
 data ShowAlways = ShowAlways | DoNotShowAlways
-  deriving (Read, Show)
-
-data Data = Data
--- Optional Elements
-  { dataBold          :: Maybe Bold
-  , dataFont          :: Maybe Font
-  , dataItalic        :: Maybe Italic
-  , dataStrikethrough :: Maybe Strikethrough
-  , dataSpan          :: Maybe Span
-  , dataSub           :: Maybe Sub
-  , dataSup           :: Maybe Sup
-  , dataUnderline     :: Maybe Underline
--- Required Attrs
-  , dataType          :: Type
--- Optional Attrs
-  , dataTicked        :: Maybe Ticked
-  }
-  deriving (Read, Show)
-
-data Type = Number | DateTime | Boolean | StringType | Error
   deriving (Read, Show)
 
 data Ticked = Ticked | NotTicked
@@ -266,10 +332,6 @@ data NamedCell = NamedCell
   }
   deriving (Read, Show)
 
--- | For now this is just a string, but we could model excel's names
-newtype Name = Name String
-  deriving (Read, Show)
-
 data NamedRange = NamedRange
   { namedRangeName     :: Name
   , namedRangeRefersTo :: RefersTo
@@ -281,10 +343,7 @@ data NamedRange = NamedRange
 newtype RefersTo = RefersTo String
   deriving (Read, Show)
 
-data Names = Names
-  { namesNamedRanges :: [NamedRange]
-  }
-  deriving (Read, Show)
+type Names = [NamedRange]
 
 data NumberFormat = NumberFormat
   { numberFormat :: Format
@@ -307,70 +366,6 @@ data Protection = Protection
 data Protected   = Protected   | NotProtected
   deriving (Read, Show)
 data HideFormula = HideFormula | DoNotHideFormula
-  deriving (Read, Show)
-
-data Row = Row
-  { rowCells         :: [Cell]
-  , rowCaption       :: Maybe String
---  , rowAutoFitHeight :: Maybe AutoFitHeight
-  , rowHeight        :: Maybe Double
-  , rowHidden        :: Maybe Hidden
-  , rowIndex         :: Maybe Word64
-  , rowSpan          :: Maybe Word64
-  , rowStyleID       :: Maybe StyleID
-  }
-  deriving (Read, Show)
-
-data Style = Style
-  { styleAlignment    :: Maybe Alignment
-  , styleBorders      :: Maybe Borders
-  , styleFont         :: Maybe Font
-  , styleInterior     :: Maybe Interior
-  , styleNumberFormat :: Maybe NumberFormat
-  , styleProtection   :: Maybe Protection
-  , styleID           :: StyleID
-  , styleName         :: Maybe Name
-  , styleParent       :: Maybe StyleID
-  }
-  deriving (Read, Show)
-
-newtype Styles = Styles [Style]
-  deriving (Read, Show)
-
-data Table = Table
-  { tableColumn              :: Maybe Column
-  , tableRow                 :: [Row]
-  , tableDefaultColumnWidth  :: Maybe Double -- ^ Default is 48
-  , tableDefaultRowHeight    :: Maybe Double -- ^ Default is 12.75
-  , tableExpandedColumnCount :: Maybe Word64
-  , tableExpandedRowCount    :: Maybe Word64
-  , tableLeftCell            :: Maybe Word64 -- ^ Default is 1
-  , tableStyleID             :: Maybe StyleID
-  , tableTopCell             :: Maybe Word64 -- ^ Default is 1
-  , tableFullColumns         :: Maybe Bool
-  , tableFullRows            :: Maybe Bool
-  }
-  deriving (Read, Show)
-
-data Workbook = Workbook
-  { workbookWorksheets       :: [Worksheet]
-  , workbookComponentOptions :: Maybe ComponentOptions
-  , workbookSmartTagType     :: [SmartTagType]
-  , workbookNames            :: Maybe Names
-  , workbookStyles           :: Maybe Styles
-  }
-  deriving (Read, Show)
-
-data Worksheet = Worksheet
-  { worksheetOptions     :: Maybe WorksheetOptions
-  , worksheetNames       :: Maybe Names
-  , worksheetTable       :: Maybe Table
-  , worksheetAutoFilter  :: Maybe AutoFilter
-  , worksheetOptionsX    :: Maybe WorksheetOptionsX
-  , worksheetName        :: Name
-  , worksheetProteced    :: Maybe Protected
---  , worksheetRightToLeft :: Maybe ReadingOrder
-  }
   deriving (Read, Show)
 
 data Sub = Sub
@@ -412,5 +407,4 @@ data WorksheetOptionsX = WorksheetOptionsX
 -}
 
 
-
-
+-}
