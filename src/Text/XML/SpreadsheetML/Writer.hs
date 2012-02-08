@@ -219,4 +219,3 @@ instance ToElement T.Cell where
 instance ToElement T.ExcelValue where
    toElement ev = mkData ev
 
-
