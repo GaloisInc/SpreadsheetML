@@ -20,6 +20,7 @@ Library
   hs-source-dirs:         src
   Exposed-modules:     Text.XML.SpreadsheetML.Types
                        Text.XML.SpreadsheetML.Writer
+                       Text.XML.SpreadsheetML.Builder
   
   -- Packages needed in order to build this package.
   Build-depends:       base > 3 && < 5,
