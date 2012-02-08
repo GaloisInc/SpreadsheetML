@@ -3,9 +3,18 @@ module Text.XML.SpreadsheetML.Writer where
 import qualified Text.XML.SpreadsheetML.Types as T
 import qualified Text.XML.Light as L
 import qualified Text.XML.Light.Types as LT
+import qualified Text.XML.Light.Output as O
 
 import Control.Applicative ( (<$>) )
 import Data.Maybe ( catMaybes, maybeToList )
+
+--------------------------------------------------------------------------
+-- | Convert a workbook to a string.  Write this string to a ".xls" file
+-- and Excel will know how to open it.
+showSpreadsheet :: T.Workbook -> String
+showSpreadsheet wb = "<?xml version='1.0' ?>\n" ++
+                     "<?mso-application progid=\"Excel.Sheet\"?>\n" ++
+                     O.showElement (toElement wb)
 
 ---------------------------------------------------------------------------
 -- | Namespaces
@@ -21,9 +30,17 @@ htmlNamespace = L.blank_name { L.qURI = Just "http://www.w3.org/TR/REC-html40" }
 --------------------------------------------------------------------------
 -- | Empty Elements
 emptyWorkbook :: LT.Element
-emptyWorkbook = L.blank_element { L.elName = workbookName }
+emptyWorkbook = L.blank_element
+  { L.elName    = workbookName
+  , L.elAttribs = [xmlns, xmlns_o, xmlns_x, xmlns_ss, xmlns_html] }
   where
-  workbookName = L.blank_name { L.qName = "Workbook" }
+  workbookName = namespace { L.qName = "Workbook" }
+  xmlns      = mkAttr "xmlns"      "urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns_o    = mkAttr "xmlns:o"    "urn:schemas-microsoft-com:office:office"
+  xmlns_x    = mkAttr "xmlns:x"    "urn:schemas-microsoft-com:office:excel"
+  xmlns_ss   = mkAttr "xmlns:ss"   "urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns_html = mkAttr "xmlns:html" "http://www.w3.org/TR/REC-html40"
+  mkAttr k v = LT.Attr L.blank_name { L.qName = k } v
 
 emptyDocumentProperties :: LT.Element
 emptyDocumentProperties = L.blank_element { L.elName = documentPropertiesName }
@@ -35,7 +52,7 @@ emptyWorksheet (T.Name n) = L.blank_element { L.elName    = worksheetName
                                             , L.elAttribs = [LT.Attr worksheetNameAttrName n] }
   where
   worksheetName = ssNamespace { L.qName   = "Worksheet" }
-  worksheetNameAttrName = ssNamespace { L.qName   = "name" }
+  worksheetNameAttrName = ssNamespace { L.qName   = "Name" }
 
 emptyTable :: LT.Element
 emptyTable = L.blank_element { L.elName = tableName }
@@ -45,17 +62,17 @@ emptyTable = L.blank_element { L.elName = tableName }
 emptyRow :: LT.Element
 emptyRow = L.blank_element { L.elName = rowName }
   where
-  rowName = ssNamespace { L.qName = "row" }
+  rowName = ssNamespace { L.qName = "Row" }
 
 emptyColumn :: LT.Element
 emptyColumn = L.blank_element { L.elName = columnName }
   where
-  columnName = ssNamespace { L.qName = "column" }
+  columnName = ssNamespace { L.qName = "Column" }
 
 emptyCell :: LT.Element
 emptyCell = L.blank_element { L.elName = cellName }
   where
-  cellName = ssNamespace { L.qName = "cell" }
+  cellName = ssNamespace { L.qName = "Cell" }
 
 -- | Break from the 'emptyFoo' naming because you can't make
 -- an empty data cell, except one holding ""
@@ -64,7 +81,7 @@ mkData v = L.blank_element { L.elName     = dataName
                            , L.elContent  = [ LT.Text (mkCData v) ]
                            , L.elAttribs  = [ mkAttr v ] }
   where
-  dataName   = ssNamespace { L.qName = "data" }
+  dataName   = ssNamespace { L.qName = "Data" }
   typeName s = ssNamespace { L.qName = s }
   typeAttr   = LT.Attr (typeName "Type")
   mkAttr (T.Number _)      = typeAttr "Number"
@@ -77,7 +94,7 @@ mkData v = L.blank_element { L.elName     = dataName
   showBoolean False = "0"
 
 -------------------------------------------------------------------------
--- | XML Conversion Classes
+-- | XML Conversion Class
 class ToElement a where
   toElement :: a -> LT.Element
 
@@ -107,7 +124,7 @@ instance ToElement T.DocumentProperties where
     toE fieldOf name toString = mkCData <$> fieldOf dp
       where
       mkCData cdata = L.blank_element
-        { L.elName    = L.blank_name { L.qName = name }
+        { L.elName    = oNamespace { L.qName = name }
         , L.elContent = [LT.Text (L.blank_cdata { L.cdData = toString cdata })] }
 
 instance ToElement T.Worksheet where

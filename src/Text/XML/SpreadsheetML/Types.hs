@@ -6,16 +6,6 @@ import Data.Word ( Word64 )
 
 -- | Only implement what we need
 
--- TODO: do we need this type?
-{-
-data ExcelWorkbook = ExcelWorkbook
-  { excelWorkbookWindowHeight :: Maybe Word64
-  , excelWorkbookWindowWidth  :: Maybe Word64
-  , excelWorkbookWindowTopX   :: Maybe Word64
-  , excelWorkbookWindowTopY   :: Maybe Word64
-  }
--}
-
 data Workbook = Workbook
   { workbookDocumentProperties :: Maybe DocumentProperties
 --  , workbookExcelWorkbook      :: Maybe ExcelWorkbook
@@ -113,13 +103,21 @@ data Hidden = Shown | Hidden
 newtype Name = Name String
   deriving (Read, Show)
 
--- | For now, the value is the name of the style to use
-{-
-newtype StyleID = StyleID String
-  deriving (Read, Show)
--}
 newtype Caption = Caption String
   deriving (Read, Show)
+
+-----------------------------------
+-- Hopefully all this down here is uncessary
+{-
+-- TODO: do we need this type?
+{-
+data ExcelWorkbook = ExcelWorkbook
+  { excelWorkbookWindowHeight :: Maybe Word64
+  , excelWorkbookWindowWidth  :: Maybe Word64
+  , excelWorkbookWindowTopX   :: Maybe Word64
+  , excelWorkbookWindowTopY   :: Maybe Word64
+  }
+-}
 
 {-
 data Style = Style
@@ -136,10 +134,12 @@ data Style = Style
   deriving (Read, Show)
 -}
 
-
------------------------------------
--- Hopefully all this down here is uncessary
+-- | For now, the value is the name of the style to use
 {-
+newtype StyleID = StyleID String
+  deriving (Read, Show)
+-}
+
 -- | Bold tag
 data Bold = Bold
   deriving (Read, Show)
