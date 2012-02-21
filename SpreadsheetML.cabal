@@ -1,7 +1,10 @@
 Name:                SpreadsheetML
 Version:             0.1
-Synopsis:            Read and write support for Excel's SpreadsheetML format
--- Description:         
+Synopsis:            Write support for Excel's SpreadsheetML format
+Description:         Output XML in the SpreadsheetML namespace. This allows you
+                     to generate XLS file for excel. Binary compressed Office Open Document format
+                     not yet supported, but you can take this xml output and name it ".xls" and
+                     Excel will be able to open the document as a spreadsheet.
 License:             BSD3
 License-file:        LICENSE
 Author:              Jason Dagit
@@ -31,4 +34,7 @@ Library
   
   -- Extra tools (e.g. alex, hsc2hs, ...) needed to build the source.
   -- Build-tools:         
-  
+
+source-repository head
+  type: git
+  location: https://github.com/dagit/SpreadsheetML
